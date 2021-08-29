@@ -1,11 +1,15 @@
-package com.terranullius.openweather.business.data.util
+package com.terranullius.clean_cache_mvvm.business.data.util
 
 
+import com.terranullius.clean_cache_mvvm.business.data.cache.CacheConstants.CACHE_TIMEOUT
+import com.terranullius.clean_cache_mvvm.business.data.cache.CacheErrors.CACHE_ERROR_TIMEOUT
+import com.terranullius.clean_cache_mvvm.business.data.cache.CacheErrors.CACHE_ERROR_UNKNOWN
+import com.terranullius.clean_cache_mvvm.business.data.cache.CacheResult
 import com.terranullius.clean_cache_mvvm.business.data.network.ApiResult
 import com.terranullius.clean_cache_mvvm.business.data.network.NetworkConstants.NETWORK_TIMEOUT
 import com.terranullius.clean_cache_mvvm.business.data.network.NetworkErrors.NETWORK_ERROR_TIMEOUT
 import com.terranullius.clean_cache_mvvm.business.data.network.NetworkErrors.NETWORK_ERROR_UNKNOWN
-import com.terranullius.openweather.business.data.util.GenericErrors.ERROR_UNKNOWN
+import com.terranullius.clean_cache_mvvm.business.data.util.GenericErrors.ERROR_UNKNOWN
 import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
@@ -53,6 +57,32 @@ suspend fun <T> safeApiCall(
         }
     }
 }
+
+suspend fun <T> safeCacheCall(
+    dispatcher: CoroutineDispatcher,
+    cacheCall: suspend () -> T?
+): CacheResult<T?> {
+    return withContext(dispatcher) {
+        try {
+            // throws TimeoutCancellationException
+            withTimeout(CACHE_TIMEOUT){
+                CacheResult.Success(cacheCall.invoke())
+            }
+        } catch (throwable: Throwable) {
+            throwable.printStackTrace()
+            when (throwable) {
+
+                is TimeoutCancellationException -> {
+                    CacheResult.GenericError(CACHE_ERROR_TIMEOUT)
+                }
+                else -> {
+                    CacheResult.GenericError(CACHE_ERROR_UNKNOWN)
+                }
+            }
+        }
+    }
+}
+
 
 
 private fun convertErrorBody(throwable: HttpException): String? {

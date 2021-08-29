@@ -1,4 +1,4 @@
-package com.terranullius.openweather.business.data.util
+package com.terranullius.clean_cache_mvvm.business.data.util
 
 object GenericErrors {
 
