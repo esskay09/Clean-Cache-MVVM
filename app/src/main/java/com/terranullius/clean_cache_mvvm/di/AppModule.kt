@@ -2,7 +2,10 @@ package com.terranullius.clean_cache_mvvm.di
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.terranullius.clean_cache_mvvm.business.data.network.abstraction.NetworkDataSource
 import com.terranullius.clean_cache_mvvm.business.data.network.implementation.NetworkDataSourceImpl
+import com.terranullius.clean_cache_mvvm.business.interactors.common.GetUsers
+import com.terranullius.clean_cache_mvvm.business.interactors.common.UserInteractors
 import com.terranullius.clean_cache_mvvm.framework.datasource.network.abstraction.UserApiService
 import com.terranullius.clean_cache_mvvm.framework.datasource.network.implementation.GoRestApiService
 import com.terranullius.clean_cache_mvvm.framework.datasource.network.implementation.UserApiServiceImpl
@@ -59,5 +62,21 @@ object AppModule {
     @Provides
     fun providesNetworkDataSource(userApiService: UserApiService): NetworkDataSourceImpl {
         return NetworkDataSourceImpl(userApiService)
+    }
+
+    @Singleton
+    @Provides
+    fun providesGetUsers(
+        networkDataSource: NetworkDataSource
+    ): GetUsers {
+        return GetUsers(networkDataSource)
+    }
+
+    @Singleton
+    @Provides
+    fun providesUserInteractors(
+        getUsers: GetUsers
+    ): UserInteractors {
+        return UserInteractors(getUsers)
     }
 }
