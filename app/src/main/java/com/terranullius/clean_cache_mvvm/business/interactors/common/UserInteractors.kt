@@ -6,6 +6,6 @@ class UserInteractors @Inject constructor(
     private val getUsers: GetUsers
 ) {
 
-    fun getUsers(page: Int) = getUsers.getUsers(page)
+    suspend fun getUsers(page: Int) = getUsers.getUsers(page)
 
 }

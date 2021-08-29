@@ -60,7 +60,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesNetworkDataSource(userApiService: UserApiService): NetworkDataSourceImpl {
+    fun providesNetworkDataSource(userApiService: UserApiService): NetworkDataSource {
         return NetworkDataSourceImpl(userApiService)
     }
 

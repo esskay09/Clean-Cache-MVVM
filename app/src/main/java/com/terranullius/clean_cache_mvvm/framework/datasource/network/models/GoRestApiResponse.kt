@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 
 data class GoRestApiResponse(
 
-    @Json(name = "Data")
+    @Json(name = "data")
     val userList: List<UserDto>,
 
     @Json(name = "meta")

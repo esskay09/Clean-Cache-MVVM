@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.terranullius.clean_cache_mvvm">
 
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:name=".framework.presentation.BaseApplication"
         android:allowBackup="false"

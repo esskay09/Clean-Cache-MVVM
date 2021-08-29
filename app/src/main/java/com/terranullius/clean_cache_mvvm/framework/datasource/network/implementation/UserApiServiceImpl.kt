@@ -10,7 +10,7 @@ class UserApiServiceImpl @Inject constructor(
     private val networkMapper: NetworkMapper
 ) : UserApiService {
 
-    override fun getUsers(page: Int): DataState {
+    override suspend fun getUsers(page: Int): DataState {
         val goRestApiResponse = goRestApiService.getUsers(page)
         return networkMapper.mapFromEntity(goRestApiResponse)
     }

@@ -14,7 +14,7 @@ import javax.inject.Inject
 class GetUsers @Inject constructor(
     private val networkDataSource: NetworkDataSource
 ) {
-    fun getUsers(page: Int): Flow<StateResource<DataState>> = flow {
+    suspend fun getUsers(page: Int): Flow<StateResource<DataState>> = flow {
 
         emit(StateResource.Loading)
 

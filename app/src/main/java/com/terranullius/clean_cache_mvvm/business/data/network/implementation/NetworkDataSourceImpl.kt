@@ -8,5 +8,5 @@ class NetworkDataSourceImpl @Inject constructor(
     private val userApiService: UserApiService
 ) : NetworkDataSource {
 
-    override fun getUsers(page: Int) = userApiService.getUsers(page)
+    override suspend fun getUsers(page: Int) = userApiService.getUsers(page)
 }

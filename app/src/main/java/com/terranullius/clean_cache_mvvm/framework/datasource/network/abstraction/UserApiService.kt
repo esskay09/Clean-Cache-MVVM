@@ -4,5 +4,5 @@ import com.terranullius.clean_cache_mvvm.business.domain.model.DataState
 
 interface UserApiService {
 
-    fun getUsers(page: Int): DataState
+    suspend fun getUsers(page: Int): DataState
 }

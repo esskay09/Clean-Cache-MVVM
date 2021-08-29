@@ -7,5 +7,5 @@ import retrofit2.http.Query
 interface GoRestApiService {
 
     @GET("users")
-    fun getUsers(@Query("page") page: Int): GoRestApiResponse
+    suspend fun getUsers(@Query("page") page: Int): GoRestApiResponse
 }
