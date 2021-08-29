@@ -71,7 +71,6 @@ suspend fun <T> safeCacheCall(
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
             when (throwable) {
-
                 is TimeoutCancellationException -> {
                     CacheResult.GenericError(CACHE_ERROR_TIMEOUT)
                 }
