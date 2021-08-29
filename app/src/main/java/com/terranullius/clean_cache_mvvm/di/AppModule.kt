@@ -1,16 +1,25 @@
 package com.terranullius.clean_cache_mvvm.di
 
+import android.content.Context
+import androidx.room.Room
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.terranullius.clean_cache_mvvm.business.data.cache.abstraction.UserCacheDataSource
+import com.terranullius.clean_cache_mvvm.business.data.cache.implementation.UserCacheDataSourceImpl
 import com.terranullius.clean_cache_mvvm.business.data.network.abstraction.NetworkDataSource
 import com.terranullius.clean_cache_mvvm.business.data.network.implementation.NetworkDataSourceImpl
-import com.terranullius.clean_cache_mvvm.business.interactors.common.GetUsers
-import com.terranullius.clean_cache_mvvm.business.interactors.common.UserInteractors
+import com.terranullius.clean_cache_mvvm.business.interactors.*
+import com.terranullius.clean_cache_mvvm.framework.datasource.cache.abstraction.UserDaoService
+import com.terranullius.clean_cache_mvvm.framework.datasource.cache.database.UserDao
+import com.terranullius.clean_cache_mvvm.framework.datasource.cache.database.UserDatabase
+import com.terranullius.clean_cache_mvvm.framework.datasource.cache.implementation.UserDaoServiceImpl
+import com.terranullius.clean_cache_mvvm.framework.datasource.cache.mappers.CacheMapper
 import com.terranullius.clean_cache_mvvm.framework.datasource.network.abstraction.UserApiService
 import com.terranullius.clean_cache_mvvm.framework.datasource.network.implementation.GoRestApiService
 import com.terranullius.clean_cache_mvvm.framework.datasource.network.implementation.UserApiServiceImpl
 import com.terranullius.clean_cache_mvvm.framework.datasource.network.mappers.NetworkMapper
 import com.terranullius.clean_cache_mvvm.util.Constants.BASE_URL
+import com.terranullius.clean_cache_mvvm.util.Constants.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -74,9 +83,83 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesUserInteractors(
-        getUsers: GetUsers
-    ): UserInteractors {
-        return UserInteractors(getUsers)
+    fun providesUserDao(
+        appContext: Context
+    ) = Room.databaseBuilder(
+        appContext,
+        UserDatabase::class.java,
+        DATABASE_NAME
+    ).build().getUserDao()
+
+    @Singleton
+    @Provides
+    fun providesCacheMapper() = CacheMapper()
+
+    @Singleton
+    @Provides
+    fun providesUserDaoService(
+        userDao: UserDao,
+        cacheMapper: CacheMapper
+    ): UserDaoService {
+        return UserDaoServiceImpl(
+            userDao,
+            cacheMapper
+        )
     }
+
+    @Singleton
+    @Provides
+    fun providesUserCacheDataSource(userDaoService: UserDaoService): UserCacheDataSource {
+        return UserCacheDataSourceImpl(
+            userDaoService
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun providesGetSavedUsersUseCase(
+        userCacheDataSource: UserCacheDataSource
+    ): GetSavedUsers {
+        return GetSavedUsers(
+            userCacheDataSource
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun providesInserUserUseCase(
+        userCacheDataSource: UserCacheDataSource
+    ): InsertUser {
+        return InsertUser(
+            userCacheDataSource
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun providesDeleteUserUseCase(
+        userCacheDataSource: UserCacheDataSource
+    ): DeleteUser {
+        return DeleteUser(
+            userCacheDataSource
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun providesUserInteractors(
+        getUsers: GetUsers,
+        getSavedUsers: GetSavedUsers,
+        deleteUser: DeleteUser,
+        insertUser: InsertUser
+    ): UserInteractors {
+        return UserInteractors(
+            getUsers,
+            getSavedUsers,
+            deleteUser,
+            insertUser
+        )
+    }
+
+
 }

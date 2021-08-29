@@ -1,4 +1,4 @@
-package com.terranullius.clean_cache_mvvm.business.interactors.common
+package com.terranullius.clean_cache_mvvm.business.interactors
 
 import com.terranullius.clean_cache_mvvm.business.data.network.ApiResponseHandler
 import com.terranullius.clean_cache_mvvm.business.data.network.NetworkErrors.NETWORK_DATA_NULL
