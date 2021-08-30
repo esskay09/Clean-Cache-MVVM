@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.terranullius.clean_cache_mvvm.framework.presentation.MainViewModel
+import com.terranullius.clean_cache_mvvm.framework.presentation.composables.MyApp
 import com.terranullius.clean_cache_mvvm.framework.presentation.composables.theme.mainPadding
 import com.terranullius.clean_cache_mvvm.framework.presentation.saved.composables.SavedUsersComposable
 
@@ -25,14 +26,17 @@ class SavedUsersFragment: Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                SavedUsersComposable(
-                    viewModel = viewModel,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(
-                            mainPadding
-                        )
-                )
+                MyApp {
+                    SavedUsersComposable(
+                        viewModel = viewModel,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(
+                                mainPadding
+                            )
+                    )
+                }
+
             }
         }
     }

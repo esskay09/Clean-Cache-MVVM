@@ -3,7 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/one/Desktop/Android Studio Projects/jobs/CleanCache_MVVM/app/src/main/res/drawable/drawer_item_color.xml" value="0.18611111111111112" />
         <entry key="..\:/one/Desktop/Android Studio Projects/jobs/CleanCache_MVVM/app/src/main/res/layout/activity_main.xml" value="0.18645833333333334" />
+        <entry key="..\:/one/Desktop/Android Studio Projects/jobs/CleanCache_MVVM/app/src/main/res/layout/nav_header.xml" value="0.22" />
       </map>
     </option>
   </component>

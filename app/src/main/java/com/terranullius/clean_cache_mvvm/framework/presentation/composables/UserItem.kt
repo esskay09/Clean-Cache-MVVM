@@ -26,13 +26,13 @@ fun UserItem(
         Card(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(4.dp)),
+                .clip(RoundedCornerShape(12.dp)),
             elevation = 4.dp,
         ) {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 12.dp, horizontal = 6.dp),
+                    .padding(vertical = 12.dp, horizontal = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
