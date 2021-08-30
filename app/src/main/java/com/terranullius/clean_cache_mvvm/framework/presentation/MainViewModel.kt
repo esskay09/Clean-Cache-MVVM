@@ -1,6 +1,5 @@
 package com.terranullius.clean_cache_mvvm.framework.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.terranullius.clean_cache_mvvm.business.domain.model.DataState
@@ -31,16 +30,27 @@ class MainViewModel @Inject constructor(
     val savedUserStateFlow: StateFlow<StateResource<DataState>>
         get() = _savedUserStateFlow
 
+    private val _pagedUserFlow: MutableStateFlow<MutableList<User>> =
+        MutableStateFlow(mutableListOf())
+    val pagedUserList: StateFlow<List<User>>
+        get() = _pagedUserFlow
+
     init {
         getUsers()
         viewModelScope.launch {
             combineApiAndCacheResponse().collectLatest {
+                if (it is StateResource.Success) refreshPagedList(it.data.userList)
                 _viewState.value = it
-                Log.d("shit", "viewState = $it")
             }
         }
         viewModelScope.launch {
             getSavedUsers()
+        }
+    }
+
+    private fun refreshPagedList(newList: List<User>) {
+        newList.forEach {
+            if (!_pagedUserFlow.value.contains(it)) _pagedUserFlow.value.add(it)
         }
     }
 
