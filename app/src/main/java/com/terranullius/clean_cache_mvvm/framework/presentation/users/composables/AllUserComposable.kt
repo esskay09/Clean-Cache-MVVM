@@ -2,9 +2,9 @@ package com.terranullius.clean_cache_mvvm.framework.presentation.users.composabl
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +32,8 @@ fun AllUserComposable(
         val viewState =
             viewModel.viewState.debounce(50).collectAsState(initial = StateResource.Loading)
 
+        val lazyListState = rememberLazyListState()
+
         when (viewState.value) {
             is StateResource.Loading -> {
                 LoadingComposable()
@@ -40,8 +42,17 @@ fun AllUserComposable(
                 ErrorComposable()
             }
             is StateResource.Success -> {
-                val userList = (viewState.value as StateResource.Success<DataState>).data.userList
-                UserColumn(userList = userList, viewModel = viewModel)
+                val userList = viewModel.pagedUserList.collectAsState().value
+
+                if (lazyListState.isScrolledToTheEnd()){
+                    viewModel.nextPage()
+                }
+
+                UserColumn(
+                    userList = userList,
+                    viewModel = viewModel,
+                    lazyListState = lazyListState
+                )
             }
         }
     }
@@ -51,13 +62,17 @@ fun AllUserComposable(
 fun UserColumn(
     modifier: Modifier = Modifier.fillMaxSize(),
     userList: List<User>,
-    viewModel: MainViewModel
+    lazyListState: LazyListState,
+    viewModel: MainViewModel,
 ) {
 
     LazyColumn(
         modifier = modifier,
+        state = lazyListState
     ) {
-        items(userList) { user ->
+        itemsIndexed(userList) { index, user ->
+
+            viewModel.setScrollPosition(index)
 
             UserItem(user) { isChecked ->
                 onCheckChange(
@@ -81,3 +96,6 @@ fun onCheckChange(
     ) else viewModel.deleteUser(user)
 
 }
+
+private fun LazyListState.isScrolledToTheEnd() =
+    layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1

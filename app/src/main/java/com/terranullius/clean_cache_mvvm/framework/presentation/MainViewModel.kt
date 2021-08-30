@@ -1,5 +1,6 @@
 package com.terranullius.clean_cache_mvvm.framework.presentation
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.terranullius.clean_cache_mvvm.business.domain.model.DataState
@@ -10,6 +11,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+private const val PAGE_LIMIT = 20
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -30,10 +33,13 @@ class MainViewModel @Inject constructor(
     val savedUserStateFlow: StateFlow<StateResource<DataState>>
         get() = _savedUserStateFlow
 
-    private val _pagedUserFlow: MutableStateFlow<MutableList<User>> =
-        MutableStateFlow(mutableListOf())
+    private val _pagedUserFlow: MutableStateFlow<List<User>> =
+        MutableStateFlow(listOf())
     val pagedUserList: StateFlow<List<User>>
         get() = _pagedUserFlow
+
+    private var userListScrollPosition = 0
+    private var currentPage = mutableStateOf(1)
 
     init {
         getUsers()
@@ -48,11 +54,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun refreshPagedList(newList: List<User>) {
-        newList.forEach {
-            if (!_pagedUserFlow.value.contains(it)) _pagedUserFlow.value.add(it)
-        }
+    fun setScrollPosition(position: Int) {
+        userListScrollPosition = position
     }
+
 
     fun insertUser(user: User) {
         viewModelScope.launch {
@@ -85,11 +90,32 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getUsers(page: Int = 1) {
+
+    private fun getUsers(page: Int = 1) {
         viewModelScope.launch {
             userInteractors.getUsers(page).collectLatest {
                 allUsersStateFlow.value = it
             }
+        }
+    }
+
+    fun nextPage() {
+        if (userListScrollPosition + 1 >= PAGE_LIMIT * currentPage.value)
+            if (_viewState.value is StateResource.Success) {
+                currentPage.value = currentPage.value + 1
+                getUsers(currentPage.value)
+            }
+    }
+
+    private fun refreshPagedList(newListApi: List<User>) {
+        val newList = ArrayList(_pagedUserFlow.value)
+        newListApi.forEach {
+            if (!newList.contains(it)) newList.add(it)
+        }
+        _pagedUserFlow.value = newList.distinctBy {
+            it.id
+        }.distinctBy {
+            it.name
         }
     }
 
