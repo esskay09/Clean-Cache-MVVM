@@ -1,5 +1,6 @@
 package com.terranullius.clean_cache_mvvm.framework.presentation
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -107,16 +108,20 @@ class MainViewModel @Inject constructor(
             }
     }
 
-    private fun refreshPagedList(newListApi: List<User>) {
-        val newList = ArrayList(_pagedUserFlow.value)
-        newListApi.forEach {
-            if (!newList.contains(it)) newList.add(it)
+    private fun refreshPagedList(newList: List<User>) {
+        val oldList = ArrayList(_pagedUserFlow.value)
+
+        newList.forEach { newUser ->
+            oldList.find { oldUser ->
+                oldUser.id == newUser.id
+            }?.let {
+                oldList[oldList.indexOf(it)] = newUser
+            } ?: oldList.add(newUser)
         }
-        _pagedUserFlow.value = newList.distinctBy {
-            it.id
-        }.distinctBy {
-            it.name
-        }
+
+        Log.d("shit", oldList.first().toString())
+
+        _pagedUserFlow.value = oldList
     }
 
     private fun combineApiAndCacheResponse(): Flow<StateResource<DataState>> {

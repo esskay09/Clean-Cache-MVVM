@@ -29,10 +29,11 @@ fun AllUserComposable(
         modifier = modifier
     )
     {
-        val viewState =
-            viewModel.viewState.debounce(50).collectAsState(initial = StateResource.Loading)
+        val viewState = viewModel.viewState.debounce(50).collectAsState(initial = StateResource.Loading)
+        val userList = viewModel.pagedUserList.collectAsState()
 
         val lazyListState = rememberLazyListState()
+
 
         when (viewState.value) {
             is StateResource.Loading -> {
@@ -42,14 +43,12 @@ fun AllUserComposable(
                 ErrorComposable()
             }
             is StateResource.Success -> {
-                val userList = viewModel.pagedUserList.collectAsState().value
 
                 if (lazyListState.isScrolledToTheEnd()){
                     viewModel.nextPage()
                 }
-
                 UserColumn(
-                    userList = userList,
+                    userList = userList.value,
                     viewModel = viewModel,
                     lazyListState = lazyListState
                 )
@@ -71,9 +70,7 @@ fun UserColumn(
         state = lazyListState
     ) {
         itemsIndexed(userList) { index, user ->
-
             viewModel.setScrollPosition(index)
-
             UserItem(user) { isChecked ->
                 onCheckChange(
                     isChecked = isChecked,
