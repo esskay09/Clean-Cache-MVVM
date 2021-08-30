@@ -7,11 +7,11 @@ import com.terranullius.clean_cache_mvvm.framework.datasource.cache.model.UserCa
 class CacheMapper : EntityMapper<UserCacheEntity, User> {
 
     override fun mapFromEntity(entity: UserCacheEntity): User {
-        return User(id = entity.id, email = entity.email)
+        return User(id = entity.id, name = entity.email)
     }
 
     override fun mapToEntity(domainModel: User): UserCacheEntity {
-        return UserCacheEntity(domainModel.id, domainModel.email)
+        return UserCacheEntity(domainModel.id, domainModel.name)
     }
 
     fun mapListEntityToListDomain(listEntity: List<UserCacheEntity>) = listEntity.map {

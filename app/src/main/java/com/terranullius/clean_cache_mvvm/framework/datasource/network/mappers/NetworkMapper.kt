@@ -29,6 +29,6 @@ class NetworkMapper : EntityMapper<GoRestApiResponse, DataState> {
 private fun List<UserDto>.toListUser() = this.map {
     User(
         id = it.id,
-        email = it.email
+        name = it.name
     )
 }
