@@ -19,7 +19,7 @@ fun UserItem(
     user: User,
     onCheckedChange: (Boolean) -> Unit = {}
 ) {
-    var isChecked by rememberSaveable {
+    var isChecked by remember(user.id) {
         mutableStateOf(user.cached)
     }
 

@@ -119,8 +119,6 @@ class MainViewModel @Inject constructor(
             } ?: oldList.add(newUser)
         }
 
-        Log.d("shit", oldList.first().toString())
-
         _pagedUserFlow.value = oldList
     }
 
