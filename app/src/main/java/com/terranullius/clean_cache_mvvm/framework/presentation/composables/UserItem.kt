@@ -36,7 +36,7 @@ fun UserItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = user.name, style = MaterialTheme.typography.h5)
+                Text(text = user.name, style = MaterialTheme.typography.h6)
 
                 IconButton(onClick = {
                     isChecked = !isChecked
