@@ -15,7 +15,10 @@ import com.terranullius.clean_cache_mvvm.framework.presentation.MainViewModel
 import com.terranullius.clean_cache_mvvm.framework.presentation.composables.ErrorComposable
 import com.terranullius.clean_cache_mvvm.framework.presentation.composables.LoadingComposable
 import com.terranullius.clean_cache_mvvm.framework.presentation.composables.UserItem
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 
+@OptIn(FlowPreview::class)
 @Composable
 fun SavedUsersComposable(
     modifier: Modifier = Modifier.fillMaxSize(),
@@ -26,7 +29,8 @@ fun SavedUsersComposable(
         modifier = modifier
     )
     {
-        val viewState = viewModel.savedUserStateFlow.collectAsState()
+        val viewState =
+            viewModel.savedUserStateFlow.debounce(50).collectAsState(StateResource.Loading)
 
         when (viewState.value) {
             is StateResource.Loading -> {
@@ -55,7 +59,7 @@ fun SavedUsersColumn(
     ) {
         items(userList) { user ->
 
-            UserItem(user){ isChecked ->
+            UserItem(user) { isChecked ->
                 onCheckChange(
                     isChecked = isChecked,
                     user = user,

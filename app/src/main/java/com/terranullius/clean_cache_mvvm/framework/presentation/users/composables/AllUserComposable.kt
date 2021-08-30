@@ -1,15 +1,13 @@
 package com.terranullius.clean_cache_mvvm.framework.presentation.users.composables
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.terranullius.clean_cache_mvvm.business.domain.model.DataState
 import com.terranullius.clean_cache_mvvm.business.domain.model.User
 import com.terranullius.clean_cache_mvvm.business.domain.state.StateResource
@@ -17,7 +15,10 @@ import com.terranullius.clean_cache_mvvm.framework.presentation.MainViewModel
 import com.terranullius.clean_cache_mvvm.framework.presentation.composables.ErrorComposable
 import com.terranullius.clean_cache_mvvm.framework.presentation.composables.LoadingComposable
 import com.terranullius.clean_cache_mvvm.framework.presentation.composables.UserItem
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 
+@OptIn(FlowPreview::class)
 @Composable
 fun AllUserComposable(
     modifier: Modifier = Modifier.fillMaxSize(),
@@ -28,7 +29,8 @@ fun AllUserComposable(
         modifier = modifier
     )
     {
-        val viewState = viewModel.viewState.collectAsState()
+        val viewState =
+            viewModel.viewState.debounce(50).collectAsState(initial = StateResource.Loading)
 
         when (viewState.value) {
             is StateResource.Loading -> {
@@ -57,7 +59,7 @@ fun UserColumn(
     ) {
         items(userList) { user ->
 
-            UserItem(user){ isChecked ->
+            UserItem(user) { isChecked ->
                 onCheckChange(
                     isChecked = isChecked,
                     user = user,
