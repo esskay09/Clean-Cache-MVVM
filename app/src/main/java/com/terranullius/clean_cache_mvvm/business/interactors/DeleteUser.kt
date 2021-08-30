@@ -14,15 +14,15 @@ import javax.inject.Inject
 class DeleteUser @Inject constructor(
     private val userCacheDataSource: UserCacheDataSource
 ) {
-    suspend fun deleteUser(user: User): Flow<StateResource<Long>> = flow {
+    suspend fun deleteUser(user: User): Flow<StateResource<Int>> = flow {
         emit(StateResource.Loading)
 
         val cacheResult = safeCacheCall(Dispatchers.IO) {
-            userCacheDataSource.insertUser(user)
+            userCacheDataSource.deleteUser(user)
         }
 
-        val result = object : CacheResponseHandler<Long>(cacheResult) {
-            override suspend fun handleSuccess(resultObj: Long): StateResource<Long> {
+        val result = object : CacheResponseHandler<Int>(cacheResult) {
+            override suspend fun handleSuccess(resultObj: Int): StateResource<Int> {
                 return if (resultObj < 0) {
                     StateResource.Error(message = CacheErrors.CACHE_ERROR)
                 } else {

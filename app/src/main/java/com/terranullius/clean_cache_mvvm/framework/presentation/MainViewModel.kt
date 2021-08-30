@@ -1,5 +1,6 @@
 package com.terranullius.clean_cache_mvvm.framework.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.terranullius.clean_cache_mvvm.business.domain.model.DataState
@@ -32,31 +33,45 @@ class MainViewModel @Inject constructor(
 
     init {
         getUsers()
-        getSavedUsers()
         viewModelScope.launch {
             combineApiAndCacheResponse().collectLatest {
                 _viewState.value = it
+                Log.d("shit", "viewState = $it")
             }
+        }
+        viewModelScope.launch {
+            getSavedUsers()
         }
     }
 
     fun insertUser(user: User) {
         viewModelScope.launch {
-            userInteractors.insertUser(user)
+            userInteractors.insertUser(user).collectLatest {
+                if (it is StateResource.Success) getSavedUsers()
+            }
         }
     }
 
     fun deleteUser(user: User) {
         viewModelScope.launch {
-            userInteractors.deleteUser(user)
+            userInteractors.deleteUser(user).collectLatest {
+                if (it is StateResource.Success) getSavedUsers()
+            }
         }
+
     }
 
-    fun getSavedUsers() {
-        viewModelScope.launch {
-            userInteractors.getSavedUsers().collectLatest {
-                _savedUserStateFlow.value = it
-            }
+    suspend fun getSavedUsers() {
+        userInteractors.getSavedUsers().map { stateRes ->
+            if (stateRes is StateResource.Success) {
+                val userList = stateRes.data.userList.map { user ->
+                    user.copy(cached = true)
+                }
+                val dataState = stateRes.data.copy(userList = userList)
+                StateResource.Success(dataState)
+            } else stateRes
+        }.collectLatest {
+            _savedUserStateFlow.value = it
         }
     }
 
@@ -75,14 +90,14 @@ class MainViewModel @Inject constructor(
             } else if (savedUsers is StateResource.Success && allUsers is StateResource.Success) {
 
                 val userListFromApi = allUsers.data.userList
-                val userListFromCache = savedUsers.data.userList
+                val userIdListFromCache = savedUsers.data.userList.map { it.id }
 
-                val updatedListWithCache = userListFromApi.map {
-                    if (userListFromCache.contains(it)) {
-                        val user = it.copy(cached = true)
+                val updatedListWithCache = userListFromApi.map { userApi ->
+                    if (userIdListFromCache.contains(userApi.id)) {
+                        val user = userApi.copy(cached = true)
                         user
                     } else {
-                        val user = it.copy(cached = false)
+                        val user = userApi.copy(cached = false)
                         user
                     }
                 }
@@ -91,7 +106,6 @@ class MainViewModel @Inject constructor(
                     userList = updatedListWithCache,
                     pageCount = allUsers.data.pageCount
                 )
-
 
                 StateResource.Success(dataState)
             } else {

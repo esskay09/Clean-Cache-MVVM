@@ -7,9 +7,9 @@
     <fragment
         android:id="@+id/allUsersFragment"
         android:name="com.terranullius.clean_cache_mvvm.framework.presentation.users.AllUsersFragment"
-        android:label="AllUsersFragment" />
+        android:label="All Users" />
     <fragment
         android:id="@+id/savedUsersFragment"
         android:name="com.terranullius.clean_cache_mvvm.framework.presentation.saved.SavedUsersFragment"
-        android:label="SavedUsersFragment" />
+        android:label="Saved users" />
 </navigation>
