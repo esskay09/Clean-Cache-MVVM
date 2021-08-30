@@ -7,9 +7,7 @@ import com.terranullius.clean_cache_mvvm.business.domain.model.User
 import com.terranullius.clean_cache_mvvm.business.domain.state.StateResource
 import com.terranullius.clean_cache_mvvm.business.interactors.UserInteractors
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,12 +23,21 @@ class MainViewModel @Inject constructor(
 
     private val allUsersStateFlow: MutableStateFlow<StateResource<DataState>> =
         MutableStateFlow(StateResource.Loading)
-    private val savedUserStateFlow: MutableStateFlow<StateResource<DataState>> =
+
+    private val _savedUserStateFlow: MutableStateFlow<StateResource<DataState>> =
         MutableStateFlow(StateResource.Loading)
+
+    val savedUserStateFlow: StateFlow<StateResource<DataState>>
+        get() = _savedUserStateFlow
 
     init {
         getUsers()
         getSavedUsers()
+        viewModelScope.launch {
+            combineApiAndCacheResponse().collectLatest {
+                _viewState.value = it
+            }
+        }
     }
 
     fun insertUser(user: User) {
@@ -48,7 +55,7 @@ class MainViewModel @Inject constructor(
     fun getSavedUsers() {
         viewModelScope.launch {
             userInteractors.getSavedUsers().collectLatest {
-                savedUserStateFlow.value = it
+                _savedUserStateFlow.value = it
             }
         }
     }
@@ -61,5 +68,35 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    private fun combineApiAndCacheResponse(): Flow<StateResource<DataState>> {
+        return combine(_savedUserStateFlow, allUsersStateFlow) { savedUsers, allUsers ->
+            if (savedUsers is StateResource.Error || allUsers is StateResource.Error) {
+                StateResource.Error(message = "Error from savedUsersFlow or allUsersFlow")
+            } else if (savedUsers is StateResource.Success && allUsers is StateResource.Success) {
 
+                val userListFromApi = allUsers.data.userList
+                val userListFromCache = savedUsers.data.userList
+
+                val updatedListWithCache = userListFromApi.map {
+                    if (userListFromCache.contains(it)) {
+                        val user = it.copy(cached = true)
+                        user
+                    } else {
+                        val user = it.copy(cached = false)
+                        user
+                    }
+                }
+                val dataState = DataState(
+                    currentPage = allUsers.data.currentPage,
+                    userList = updatedListWithCache,
+                    pageCount = allUsers.data.pageCount
+                )
+
+
+                StateResource.Success(dataState)
+            } else {
+                StateResource.Loading
+            }
+        }
+    }
 }

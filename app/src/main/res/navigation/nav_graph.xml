@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/allUsersFragment">
+
+    <fragment
+        android:id="@+id/allUsersFragment"
+        android:name="com.terranullius.clean_cache_mvvm.framework.presentation.users.AllUsersFragment"
+        android:label="AllUsersFragment" />
+    <fragment
+        android:id="@+id/savedUsersFragment"
+        android:name="com.terranullius.clean_cache_mvvm.framework.presentation.saved.SavedUsersFragment"
+        android:label="SavedUsersFragment" />
+</navigation>

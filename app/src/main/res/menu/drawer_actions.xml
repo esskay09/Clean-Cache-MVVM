@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@id/frag_all_users_dest"
+        android:id="@id/allUsersFragment"
         android:title="All Users" />
     <item
-        android:id="@id/frag_saved_users_dest"
+        android:id="@id/savedUsersFragment"
         android:title="Saved Users" />
 </menu>
