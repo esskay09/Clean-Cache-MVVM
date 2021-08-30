@@ -21,7 +21,7 @@ class UserDaoServiceImpl @Inject constructor(
         return userDao.insertUser(userEntity)
     }
 
-    override suspend fun deleteUser(user: User): Long {
+    override suspend fun deleteUser(user: User): Int {
         val userEntity = cacheMapper.mapToEntity(user)
         return userDao.deleteUser(userEntity)
     }

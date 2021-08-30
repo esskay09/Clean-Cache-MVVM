@@ -23,6 +23,7 @@ import com.terranullius.clean_cache_mvvm.util.Constants.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -84,7 +85,7 @@ object AppModule {
     @Singleton
     @Provides
     fun providesUserDao(
-        appContext: Context
+        @ApplicationContext appContext: Context
     ) = Room.databaseBuilder(
         appContext,
         UserDatabase::class.java,

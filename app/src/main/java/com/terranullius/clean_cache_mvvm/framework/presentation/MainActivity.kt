@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launchWhenStarted {
             viewModel.viewState.collect {
-                Log.d("shit", it.toString())
+                Log.d("train", it.toString())
             }
         }
     }

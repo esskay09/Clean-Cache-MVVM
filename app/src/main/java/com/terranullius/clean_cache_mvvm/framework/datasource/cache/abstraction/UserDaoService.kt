@@ -8,5 +8,5 @@ interface UserDaoService {
 
     suspend fun insertUser(user: User): Long
 
-    suspend fun deleteUser(user: User): Long
+    suspend fun deleteUser(user: User): Int
 }
