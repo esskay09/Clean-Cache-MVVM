@@ -6,6 +6,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,7 +19,7 @@ fun UserItem(
     user: User,
     onCheckedChange: (Boolean) -> Unit = {}
 ) {
-    var isChecked by remember {
+    var isChecked by rememberSaveable {
         mutableStateOf(user.cached)
     }
 
